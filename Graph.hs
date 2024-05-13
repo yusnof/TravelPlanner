@@ -24,43 +24,49 @@ data Edge a b = Edge
   , label :: b  -- ^ The label
   } deriving Show
 
-data Node = String 
-
 -- A graph with nodes of type a and labels of type b.
-data Graph a b =  M Node [a String b]  -- TODO: implement a graph with adjacency lists, hint: use a Map.
--- a list ot trepules, (edge vortex) 
+newtype Graph a b = Graph (Map a [Edge a b]) 
 
 -- | Create an empty graph
 empty :: Graph a b
-empty = undefined
+empty = Graph (M.empty)
 
 -- | Add a vertex (node) to a graph
+-- map.insert is o(log n)
 addVertex :: Ord a => a -> Graph a b -> Graph a b
-addVertex v g = undefined
+addVertex v (Graph m) = Graph (M.insert v [] m) 
 
 -- | Add a list of vertices to a graph
 addVertices :: Ord a => [a] -> Graph a b -> Graph a b
-addVertices vs g = undefined
+addVertices [] g = g
+addVertices [v] g = addVertex v g
+addVertices (v:vs) g = addVertices vs (addVertex v g)
 
--- | Add an edge to a graph, the first parameter is the start vertex (of type a), 
+--  Add an edge to a graph, the first parameter is the start vertex (of type a), 
 -- the second parameter the destination vertex, and the third parameter is the
--- label (of type b)
+-- label (of type b) and the last one is the graph.
 addEdge :: Ord a => a -> a -> b -> Graph a b -> Graph a b
-addEdge v w l = undefined
-
+addEdge srt dest label (Graph m) = Graph (M.insert srt appendEdgeLists m)
+  where appendEdgeLists = [Edge srt dest label] ++ (unWrap (M.lookup srt m))
+        unWrap (Just x) = x
+        unWrap Nothing = [] -- error handling? I dunno should we just crash?
+  
 -- | Add an edge from start to destination, but also from destination to start,
 -- with the same label.
 addBiEdge :: Ord a => a -> a -> b -> Graph a b -> Graph a b
-addBiEdge v w l = undefined
+addBiEdge src dest label y = addEdge src dest label (addEdge dest src label y)
+  
 
 -- | Get all adjacent vertices (nodes) for a given node
 adj :: Ord a => a -> Graph a b -> [Edge a b]
-adj v g = undefined
-
+adj k (Graph m)= unWrap(M.lookup k m)
+  where unWrap (Just x) = x
+        unWrap Nothing = []
+        
 -- | Get all vertices (nodes) in a graph
 vertices :: Graph a b -> [a]
-vertices g = undefined
+vertices (Graph m) =  map fst (M.toList m) --Så vackert! Det är bara ett Namn! 3 plus points
 
 -- | Get all edges in a graph
 edges :: Graph a b -> [Edge a b]
-edges g = undefined
+edges (Graph m) = concatMap snd (M.toList m)
