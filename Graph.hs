@@ -46,8 +46,8 @@ addVertices (v:vs) g = addVertices vs (addVertex v g)
 -- the second parameter the destination vertex, and the third parameter is the
 -- label (of type b) and the last one is the graph.
 addEdge :: Ord a => a -> a -> b -> Graph a b -> Graph a b
-addEdge srt dest label (Graph m) = Graph (M.insert srt appendEdgeLists m)
-  where appendEdgeLists = [Edge srt dest label] ++ (unWrap (M.lookup srt m))
+addEdge srt dest label (Graph m) = Graph (M.insert srt appendEdgeLists m) -- adje
+  where appendEdgeLists = [Edge srt dest label] ++ unWrap (M.lookup srt m)
         unWrap (Just x) = x
         unWrap Nothing = [] -- error handling? I dunno should we just crash?
   
@@ -55,11 +55,11 @@ addEdge srt dest label (Graph m) = Graph (M.insert srt appendEdgeLists m)
 -- with the same label.
 addBiEdge :: Ord a => a -> a -> b -> Graph a b -> Graph a b
 addBiEdge src dest label y = addEdge src dest label (addEdge dest src label y)
-  
+
 
 -- | Get all adjacent vertices (nodes) for a given node
 adj :: Ord a => a -> Graph a b -> [Edge a b]
-adj k (Graph m)= unWrap(M.lookup k m)
+adj k (Graph m)= unWrap(M.lookup k m) --findWithDefault 
   where unWrap (Just x) = x
         unWrap Nothing = []
         
