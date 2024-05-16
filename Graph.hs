@@ -2,7 +2,6 @@ module Graph
   ( -- * Edge
     Edge                    -- type
   , src, dst, label         -- querying an Edge
-
     -- * Graph
   , Graph                   -- type
   , empty                   -- create an empty map
