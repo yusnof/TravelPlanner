@@ -21,10 +21,16 @@ shortestPath g from to = do -- TODO: implement Dijkstra's algorithm
       | otherwise = do
         let current = PQ.key (PQ.findMin q) -- might be Nothing
         let adjacent = adj current g
-    
-    insertAll ((Edge src dst label):xs) q = insertIntoQ dst (distanceToStart (Edge src dst label)) unvisited 
+        PQ.deleteMin unvisited
+        recursive (insertAll adjacent unvisited) g
 
-    unvisited:: PSQ Edge (Maybe Int)
+
+
+    insertAll [] q = q
+    insertAll [x] q = insertAll x q
+    insertAll ((Edge src dst label):xs) q = insertAll xs (insertIntoQ dst (distanceToStart (Edge src dst label)))
+
+    unvisited:: PSQ Edge Int
     unvisited = PQ.empty
     
     insertIntoQ k v q= PQ.insert k v q
