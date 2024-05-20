@@ -56,6 +56,7 @@ addBiEdge :: Ord a => a -> a -> b -> Graph a b -> Graph a b
 addBiEdge src dest label y = addEdge src dest label (addEdge dest src label y)
 
 
+
 -- | Get all adjacent vertices (nodes) for a given node
 adj :: Ord a => a -> Graph a b -> [Edge a b]
 adj k (Graph m)= unWrap(M.lookup k m) --findWithDefault 

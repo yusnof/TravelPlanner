@@ -1,0 +1,294 @@
+1	23
+ÖstraSjukhuset		
+Härlanda		6
+Redbergsplatsen		2
+Centralstationen	6
+Brunnsparken		2
+Grönsakstorget		2
+Hagakyrkan		2
+Järntorget		2
+Olivedalsgatan		2
+Botaniska		2
+Marklandsgatan		3
+FrölundaTorg		6
+Marklandsgatan		6
+Botaniska		3
+Olivedalsgatan		2
+Järntorget		2
+Hagakyrkan		2
+Grönsakstorget		2
+Brunnsparken		2
+Centralstationen	2
+Redbergsplatsen		6
+Härlanda		2
+ÖstraSjukhuset		6
+		
+2	19
+Biskopsgården		
+Nordstan		10
+Brunnsparken		1
+Grönsakstorget		1
+Vasaplatsen		1
+VasaViktoriagatan	1
+Olivedalsgatan		4
+Botaniska		3
+Marklandsgatan		3
+AxelDahlströmsTorg	1
+Marklandsgatan		1
+Botaniska		3
+Olivedalsgatan		3
+VasaViktoriagatan	4
+Vasaplatsen		1
+Grönsakstorget		1
+Brunnsparken		1
+Nordstan		1
+Biskopsgården		10
+		
+3	25
+Torp		
+Härlanda		4
+Redbergsplatsen		2
+Centralstationen	6
+Brunnsparken		2
+Valand			4
+Vasaplatsen		1
+VasaViktoriagatan	1
+Hagakyrkan		2
+Järntorget		4
+Stigbergstorget		3
+Mariaplan		7
+Marklandsgatan		4
+Mariaplan		4
+Stigbergstorget		7
+Järntorget		3
+Hagakyrkan		4
+VasaViktoriagatan	2
+Vasaplatsen		1
+Valand			1
+Brunnsparken		4
+Centralstationen	2
+Redbergsplatsen		6
+Härlanda		2
+Torp			4
+		
+4	21
+Broplatsen		
+Korsvägen		11
+Valand			4
+Brunnsparken		2
+Grönsakstorget		2
+Hagakyrkan		2
+Järntorget		2
+Stigbergstorget		3
+Mariaplan		6
+Kungssten		3
+Saltholmen		6
+Kungssten		6
+Mariaplan		3
+Stigbergstorget		6
+Järntorget		3
+Hagakyrkan		2
+Grönsakstorget		2
+Brunnsparken		2
+Valand			2
+Korsvägen		4
+Broplatsen		11
+		
+5	17
+Torp		
+SanktSigfridsplan	8
+Korsvägen		2
+Valand			4
+Brunnsparken		3
+LillaBommen		1
+Frihamnen		4
+Biskopsgården		15
+Länsmansgården		2
+Biskopsgården		2
+Frihamnen		15
+LillaBommen		4
+Brunnsparken		1
+Valand			3
+Korsvägen		4
+SanktSigfridsplan	2
+Torp			8
+		
+6	19
+Kortedala		
+Gamlestadstorget	15
+Redbergsplatsen		4
+Centralstationen	6
+Brunnsparken		2
+Valand			2
+Vasaplatsen		1
+Chalmers		3
+WavrinskisPlats		1
+Guldheden		3
+WavrinskisPlats		3
+Chalmers		1
+Vasaplatsen		3
+Valand			1
+Brunnsparken		2
+Centralstationen	2
+Redbergsplatsen		6
+Gamlestadstorget	4
+Kortedala		15
+		
+7	25
+Bergsjön		
+Gamlestadstorget	15
+Centralstationen	6
+Brunnsparken		2
+Grönsakstorget		2
+Vasaplatsen		1
+Chalmers		3
+WavrinskisPlats		1
+Sahlgrenska		2
+Botaniska		2
+Marklandsgatan		3
+FrölundaTorg		6
+Tynnered		3
+FrölundaTorg		3
+Marklandsgatan		6
+Botaniska		3
+Sahlgrenska		2
+WavrinskisPlats		2
+Chalmers		1
+Vasaplatsen		3
+Grönsakstorget		1
+Brunnsparken		2
+Centralstationen	2
+Gamlestadstorget	6
+Bergsjön		15
+		
+8	17
+Angered		
+Gamlestadstorget	12
+Centralstationen	6
+Brunnsparken		2
+Valand			4
+Vasaplatsen		1
+Chalmers		3
+WavrinskisPlats		1
+Sahlgrenska		2
+WavrinskisPlats		2
+Chalmers		1
+Vasaplatsen		3
+Valand			1
+Brunnsparken		4
+Centralstationen	2
+Gamlestadstorget	6
+Angered			12
+		
+9	19
+Angered		
+Gamlestadstorget	12
+Centralstationen	6
+Brunnsparken		2
+Grönsakstorget		2
+Hagakyrkan		2
+Järntorget		2
+Stigbergstorget		3
+Sannaplan		8
+Kungssten		1
+Sannaplan		1
+Stigbergstorget		8
+Järntorget		3
+Hagakyrkan		2
+Grönsakstorget		2
+Brunnsparken		2
+Centralstationen	2
+Gamlestadstorget	6
+Angered			12
+		
+0	11
+LillaBommen		
+Rosenlund		3
+LundbyStrand		2
+Lindholmen		1
+Eriksberg		3
+Klippan			5
+Eriksberg		5
+Lindholmen		3
+LundbyStrand		1
+Rosenlund		2
+LillaBommen		3
+		
+34	13
+ÖstraSjukhuset		
+Härlanda		12
+Redbergsplatsen		2
+Olskrokstorget		1
+Centralstationen	5
+HjBrantingsplatsen	6
+Hinnebäcksgatan		17
+HjBrantingsplatsen	17
+Centralstationen	6
+Olskrokstorget		5
+Redbergsplatsen		1
+Härlanda		2
+ÖstraSjukhuset		12
+		
+40	17
+Pilbågsgatan		
+Valand			8
+Brunnsparken		6
+HjBrantingsplatsen	6
+Brunnsbotorget		5
+Körkarlensgata		8
+Tagene			3
+Klareberg		8
+Angered			7
+Klareberg		7
+Tagene			8
+Körkarlensgata		3
+Brunnsbotorget		8
+HjBrantingsplatsen	5
+Brunnsparken		6
+Valand			6
+Pilbågsgatan		8
+		
+51	15
+Linneplatsen		
+Sahlgrenska		2
+Pilbågsgatan		9
+Korsvägen		5
+Ullevi			4
+Olskrokstorget		4
+Brunnsbotorget		5
+Skogome			13
+Brunnsbotorget		13
+Olskrokstorget		5
+Ullevi			4
+Korsvägen		4
+Pilbågsgatan		5
+Sahlgrenska		9
+Linneplatsen		2
+		
+60	17
+Redbergsplatsen		
+Kärralundsgatan		6
+Ullevi			5
+Centralstationen	3
+Brunnsparken		1
+Grönsakstorget		3
+Vasaplatsen		1
+Pilbågsgatan		5
+Sörgårdsskolan		4
+Pilbågsgatan		4
+Vasaplatsen		5
+Grönsakstorget		1
+Brunnsparken		3
+Centralstationen	1
+Ullevi			3
+Kärralundsgatan		5
+Redbergsplatsen		6
+		
+62	7
+Redbergsplatsen		
+Kärralundsgatan		3
+SanktSigfridsplan	5
+Kallebäck		8
+SanktSigfridsplan	8
+Kärralundsgatan		5
+Redbergsplatsen		3
