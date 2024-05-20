@@ -16,15 +16,16 @@ shortestPath g from to = do -- TODO: implement Dijkstra's algorithm
   map help adjacent -- add all adjacent (unvisited) nodes with their distance to Queue.
   
    where
-    recursive q g
+    recursive q g    -- CURRENTLY ADDS NODES TO
       | PQ.null q = []
       | otherwise = do
         let current = PQ.key (PQ.findMin q) -- might be Nothing
-        let adjacent = adj current g
+        let adjacent = [x | x <- adj current g, notVisited x ]
         PQ.deleteMin unvisited
         recursive (insertAll adjacent unvisited) g
 
-
+    notVisited (Edge src dst label) | PQ.lookup dst q == Nothing = True
+                                    | otherwise = false
 
     insertAll [] q = q
     insertAll [x] q = insertAll x q
