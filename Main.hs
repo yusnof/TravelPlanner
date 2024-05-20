@@ -45,11 +45,15 @@ startGUI :: IO ()
 startGUI = do
   Right stops <- readStops "your-stops.txt"
   Right lines <- readLines "your-lines.txt"
-  --let graph = addVertices [stops.fst] (addEdge extract lines) -- TODO: build your graph here using stops and lines
+  let graph = buildGraph stops lines  
   print $ "endOfStartGUI" 
   
---extract :: LineTable -> Edge a b 
---extract (LineTable _ (x:y:xs)) = addEdge x y exName(x) empty
+stopsToString ::  [Stop] -> [String]
+stopsToString [x] = [extr x]
+stopsToString (x:xs) = extr x : stopsToString xs  
 
-exName (LineStop name time) = name
-   
+extr :: Stop -> String 
+extr (Stop name b) = name
+
+buildGraph :: [Stop] -> [LineTable] -> Graph String b
+buildGraph stops lines = addVertices (stopsToString stops) Graph.empty
