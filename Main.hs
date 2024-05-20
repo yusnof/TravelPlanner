@@ -1,7 +1,6 @@
 
 import Route
 import Graph  -- Create a module and use a sensible graph representation
---import Data.PQueue.Min -- as PQ
 import Data.PSQueue as PQ
 
 
@@ -13,17 +12,24 @@ import Data.PSQueue as PQ
 -- Make alg recursive, currently only "implemented" for the first step.
 shortestPath :: Graph a b -> a -> a -> Maybe ([a], b)
 shortestPath g from to = do -- TODO: implement Dijkstra's algorithm
-  visited = visited ++ insert from (Just 0) -- add start
-  let adjacent = adj from g -- get adjacent
-   
+  PQ.insert from (Just 0) unvisited   -- add start
+  
   map help adjacent -- add all adjacent (unvisited) nodes with their distance to Queue.
   
    
    where
-    visited = []
-    unvisited:: PSQueue Edge (Maybe Int)
+    recursive q g
+      | PQ.null q = []
+      | otherwise = do
+        let current = PQ.key (PQ.findMin q) -- might be Nothing
+        let adjacent = adj current g
+      
+     
+    unvisited:: PSQ Edge (Maybe Int)
     unvisited = PQ.empty
-    help  (Edge src dst label) = 
+    
+    insertIntoQ k v q= q.insert k v
+    distanceToStart (Edge scr dest label) = label + PQ.prio (PQ.findMin q)
 
 main :: IO ()
 main = do 
