@@ -1,41 +1,51 @@
 import Route
-import Graph  -- Create a module and use a sensible graph representation
+import Graph   -- Create a module and use a sensible graph representation
 import Data.PSQueue as PQ
+import Data.Map as M
 
-
---type PrioQ = MinPQueue Edge (Maybe Int)
-
---To do: 
---Store dequeue from PQ into a list
--- Make alg recursive, currently only "implemented" for the first step.
 shortestPath :: Graph a b -> a -> a -> Maybe ([a], b)
-shortestPath g from to = do -- TODO: implement Dijkstra's algorithm
-  PQ.insert from 0 unvisited   -- add start
-  
-  --map help adjacent -- add all adjacent (unvisited) nodes with their distance to Queue.
-  
+shortestPath g from to = do
+ PQ.insert from 0 unvisited
+ let set = dijkstra unvisited visited g
+ return (findShortest set to [], snd(M.lookup to set))
    where
-    recursive q g    -- CURRENTLY ADDS NODES TO
-      | PQ.null q = []
+    findShortest set n lst
+     | n==to = lst
+     | otherwise = do
+      let tmp = M.lookup n set
+      let adjacent = adj (fst tmp)
+      let min = findMin (tail adjacent) (head adjacent)
+      findShortest set min (lst++getName min)
+    
+    findMin :: [a] -> b
+    findMin [] smallest = smallest
+    findMin [x] smallest = min (snd(M.lookup x set)) (snd(M.lookup smallest set))
+    findMin (x:xs) smallest = findMin xs (min (snd(M.lookup x set)) (snd(M.lookup smallest set)))
+
+    visited:: Map a (Edge a b ,Int) -- set of all visited nodes
+    visited = M.empty
+    unvisited:: PSQ (Edge a b)  Int  -- p.queue of all not visited nodes
+    unvisited = PQ.empty
+
+
+dijkstra q m g  -- returns set of all nodes in graph with distances from start node.
+      | PQ.null q = m  -- pq is empty, no unvisited nodes. return set of visited
       | otherwise = do
         let current = PQ.key (PQ.findMin q) -- might be Nothing
-        let adjacent = [x | x <- adj current g, notVisited x ]
-        PQ.deleteMin unvisited
-        recursive (insertAll adjacent unvisited) g
-        
-    notVisited (Edge src dst label) | PQ.lookup dst q == Nothing = True
-                                    | otherwise = false
-
-    insertAll [] q = q
-    insertAll [x] q = insertAll x q
-    insertAll ((Edge src dst label):xs) q = insertAll xs (insertIntoQ dst (distanceToStart (Edge src dst label)))
-
-    unvisited:: PSQ Edge Int
-    unvisited = PQ.empty
-    
-    insertIntoQ k v q= PQ.insert k v q
-    
-    distanceToStart (Edge scr dest label) = label + PQ.prio (PQ.findMin q)
+        let adjacent = [x | x <- adj current g, notVisited x] --build list of adjacent unvisited nodes
+        let distanceToCurrent = PQ.prio (PQ.findMin q) -- distance from start to current
+        M.insert current (current, distanceToCurrent) m -- add current to visited , key from PQ becoems key in map
+        PQ.deleteMin q -- delete current from queue because it is now visited
+        dijkstra (insertAllPQ adjacent q) m g -- recursive until done
+    where
+      notVisited edge 
+       | isNothing (M.lookup (getDst edge) m) = true  
+       | otherwise = false
+      distanceToStart edge = (getLabel edge) + PQ.prio (PQ.findMin q)
+      insertAllPQ [] q = q
+      insertAllPQ [x] q = insertAllPQ x q
+      insertAllPQ (edge:xs) q = insertAllPQ xs (insertIntoQ (getDst edge) (distanceToStart edge))
+      insertIntoQ = PQ.insert
 
 main :: IO ()
 main = do 
@@ -44,32 +54,25 @@ main = do
 
 startGUI :: IO ()
 startGUI = do
-  Right stops <- readStops "your-stops.txt"
-  Right lines <- readLines "your-lines.txt"
-  let graph = buildGraph stops lines  
+  Right stops <- readStops "your-stops.txt" --Returns [Stops]
+  Right lines <- readLines "your-lines.txt" --Returns [Linetables]
+  let graph = buildGraph stops lines
+  print (shortestPath(graph "Angered" "Chalmers"))
   print $ "endOfStartGUI" 
-  
-
-
-stopsToString ::  [Stop] -> [String]
-stopsToString [x] = [extr x]
-stopsToString (x:xs) = extr x : stopsToString xs  
-
-lineToEdge :: [LineTable] -> [Edge String Int]
-lineToEdge [] = []
-lineToEdge (LineTable _ stops:rest) = stopsToEdges stops ++ lineToEdge rest
-  where
-    stopsToEdges :: [LineStop] -> [Edge String Int]
-    stopsToEdges [] = []
-    stopsToEdges [_] = []  
-    stopsToEdges (x:y:xs) = Edge (name x) (name y) (timeDifference x y) : stopsToEdges (y:xs)
-
-    timeDifference :: LineStop -> LineStop -> Int
-    timeDifference stop1 stop2 = time stop2 - time stop1  
+   
 
 
 extr :: Stop -> String 
 extr (Stop name b) = name
 
-buildGraph :: [Stop] -> [LineTable] -> Graph String b
-buildGraph stops lines = addVertices (stopsToString stops) (lineToEdge lines)
+buildGraph :: [Stop] -> [LineTable] -> (Graph String Integer)
+buildGraph stops = Prelude.foldr addEdges initialGraph   
+ where     
+  initialGraph = Prelude.foldr (addVertex . name) Empty stops    addEdges (LineTable  stops) 
+  graph = Prelude.foldr addStopEdge graph (zip stops (Prelude.drop 1 stops))     
+  addStopEdge (LineStop s1 , LineStop s2 t2) 
+  -- g = addEdge s1 s2 t2 (addEdge s2 s1 t2 g)
+
+
+
+

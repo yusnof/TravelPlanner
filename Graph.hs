@@ -1,8 +1,8 @@
 module Graph 
   ( -- * Edge
-    Edge                    -- type
-  , src, dst, label         -- querying an Edge
-    -- * Graph
+    Edge          -- type
+  , src, dst, label        -- querying an Edge
+    -- * Grapgh
   , Graph                   -- type
   , empty                   -- create an empty map
   , addVertex, addVertices  -- adding vertices (nodes)
@@ -68,3 +68,12 @@ vertices (Graph m) =  map fst (M.toList m) --Så vackert! Det är bara ett Namn!
 -- | Get all edges in a graph
 edges :: Graph a b -> [Edge a b]
 edges (Graph m) = concatMap snd (M.toList m)
+
+getLabel :: Edge a b -> b 
+getLabel (Edge _ _ label) = label
+
+getDst :: Edge a b -> a 
+getDst (Edge _ dst _) = dst
+
+getName :: Edge a b -> a 
+getName (Edge name _ _) = name 
