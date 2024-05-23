@@ -17,6 +17,7 @@ shortestPath g from to = do
       let min = findMin (tail adjacent) (head adjacent)
       findShortest set min (lst++getName min)
      
+     
     findMin :: [a] -> b
     findMin [] smallest = smallest
     findMin [x] smallest 
