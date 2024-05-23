@@ -16,12 +16,21 @@ shortestPath g from to = do
       let adjacent = adj (fst tmp)
       let min = findMin (tail adjacent) (head adjacent)
       findShortest set min (lst++getName min)
-    
+     
+    findMin :: [a] -> b
+    findMin [] smallest = smallest
+    findMin [x] smallest 
+      |snd (M.lookup x set) < snd(M.lookup smallest set) = M.lookup x set
+      |otherwise = smallest
+    findMin (x:xs) smallest 
+      |snd (M.lookup x set) < snd(M.lookup smallest set) = findMin xs (M.lookup x set)
+      |otherwise = findMin xs smallest
+    {-  -- problemet med det här är att min returnerar en int. men vi vill returnera själva edgen.
     findMin :: [a] -> b
     findMin [] smallest = smallest
     findMin [x] smallest = min (snd(M.lookup x set)) (snd(M.lookup smallest set))
     findMin (x:xs) smallest = findMin xs (min (snd(M.lookup x set)) (snd(M.lookup smallest set)))
-
+   -}
     visited:: Map a (Edge a b ,Int) -- set of all visited nodes
     visited = M.empty
     unvisited:: PSQ (Edge a b)  Int  -- p.queue of all not visited nodes
@@ -72,7 +81,3 @@ buildGraph stops = Prelude.foldr addEdges initialGraph
   graph = Prelude.foldr addStopEdge graph (zip stops (Prelude.drop 1 stops))     
   addStopEdge (LineStop s1 , LineStop s2 t2) 
   -- g = addEdge s1 s2 t2 (addEdge s2 s1 t2 g)
-
-
-
-
