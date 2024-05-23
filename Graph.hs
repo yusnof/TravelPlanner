@@ -1,7 +1,7 @@
 module Graph 
   ( -- * Edge
-    Edge          -- type
-  , src, dst, label        -- querying an Edge
+    Edge (..)      -- type
+  --, src, dst, label        -- querying an Edge
     -- * Grapgh
   , Graph                   -- type
   , empty                   -- create an empty map
@@ -9,6 +9,10 @@ module Graph
   , addEdge, addBiEdge      -- adding edges (one way or both ways)
   , adj                     -- get adjacent nodes for a given node
   , vertices, edges         -- querying a Graph
+  , getName
+  , getDst
+  , getLabel 
+  , graphLookUp
   ) where
 
 import Data.Map (Map)
@@ -24,7 +28,7 @@ data Edge a b = Edge
   } deriving Show
 
 -- A graph with nodes of type a and labels of type b.
-newtype Graph a b = Graph (Map a [Edge a b]) 
+newtype Graph a b = Graph (Map a [Edge a b]) deriving (Show)
 
 -- | Create an empty graph
 empty :: Graph a b
@@ -47,8 +51,8 @@ addVertices (v:vs) g = addVertices vs (addVertex v g)
 addEdge :: Ord a => a -> a -> b -> Graph a b -> Graph a b
 addEdge srt dest label (Graph m) = Graph (M.insert srt appendEdgeLists m) -- adje
   where appendEdgeLists = [Edge srt dest label] ++ unWrap (M.lookup srt m)
-        unWrap (Just x) = x
-        unWrap Nothing = [] -- error handling? I dunno should we just crash?
+unWrap (Just x) = x
+unWrap Nothing = []
   
 -- | Add an edge from start to destination, but also from destination to start,
 -- with the same label.
@@ -76,4 +80,5 @@ getDst :: Edge a b -> a
 getDst (Edge _ dst _) = dst
 
 getName :: Edge a b -> a 
-getName (Edge name _ _) = name 
+getName (Edge name _ _) = name
+graphLookUp k (Graph m) = unWrap(M.lookup k m) 
