@@ -2,7 +2,7 @@
 import Route
 import Graph  -- Create a module and use a sensible graph representation
 import Data.PSQueue as PQ
-
+import Data.Map as M
 
 --type PrioQ = MinPQueue Edge (Maybe Int)
 
@@ -13,26 +13,26 @@ shortestPath :: Graph a b -> a -> a -> Maybe ([a], b)
 shortestPath g from to = do -- TODO: implement Dijkstra's algorithm
   PQ.insert from 0 unvisited   -- add start
   
-  map help adjacent -- add all adjacent (unvisited) nodes with their distance to Queue.
+  --map help adjacent -- add all adjacent (unvisited) nodes with their distance to Queue.
   
    where
-    recursive q g 
-      | PQ.null q = []
+    dijkstra q g m  -- returns set of all nodes in graph with distances from start node.
+      | PQ.null q = visited  -- pq is empty, no unvisited nodes. return set of unvisited
       | otherwise = do
         let current = PQ.key (PQ.findMin q) -- might be Nothing
         let adjacent = [x | x <- adj current g, notVisited x ] 
-        
-        PQ.deleteMin q
-        -- add to visited
-        recursive (insertAll adjacent q) g
+        M.insert current (current,PQ.findMin q) m -- add to visited , key form PQ becoems key in graph
+        PQ.deleteMin q -- delet current because it is now visited
+        dijkstra (insertAll adjacent q) g visited -- recursive until done
     
-    notVisited (Edge src dst label) | PQ.lookup dst q == Nothing = True
-                                    | otherwise = false
+    notVisited (Edge src dst label) 
+      | isNothing (M.lookup dst visited) = true  
+      | otherwise = false
 
-    visited:: [Edges]
-    visited= []
+    visited:: Map a (Edge,Int) -- set of all visited nodes
+    visited= M.empty
 
-    unvisited:: PSQ Edge Int
+    unvisited:: PSQ Edge Int  -- p.queue of all not visited nodes
     unvisited = PQ.empty
     
     insertIntoQ k v q= PQ.insert k v q
