@@ -1,4 +1,3 @@
-
 import Route
 import Graph  -- Create a module and use a sensible graph representation
 import Data.PSQueue as PQ
@@ -13,7 +12,7 @@ shortestPath :: Graph a b -> a -> a -> Maybe ([a], b)
 shortestPath g from to = do -- TODO: implement Dijkstra's algorithm
   PQ.insert from 0 unvisited   -- add start
   
-  map help adjacent -- add all adjacent (unvisited) nodes with their distance to Queue.
+  --map help adjacent -- add all adjacent (unvisited) nodes with their distance to Queue.
   
    where
     recursive q g    -- CURRENTLY ADDS NODES TO
@@ -23,7 +22,7 @@ shortestPath g from to = do -- TODO: implement Dijkstra's algorithm
         let adjacent = [x | x <- adj current g, notVisited x ]
         PQ.deleteMin unvisited
         recursive (insertAll adjacent unvisited) g
-
+        
     notVisited (Edge src dst label) | PQ.lookup dst q == Nothing = True
                                     | otherwise = false
 
@@ -35,6 +34,7 @@ shortestPath g from to = do -- TODO: implement Dijkstra's algorithm
     unvisited = PQ.empty
     
     insertIntoQ k v q= PQ.insert k v q
+    
     distanceToStart (Edge scr dest label) = label + PQ.prio (PQ.findMin q)
 
 main :: IO ()
