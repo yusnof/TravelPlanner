@@ -76,7 +76,6 @@ extr :: Stop -> String
 extr (Stop name b) = name
 
 buildGraph :: [Stop] -> [LineTable] -> (Graph String Integer)
-<<<<<<< HEAD
 buildGraph = undefined 
 
 
@@ -89,4 +88,3 @@ buildGraph stops = Prelude.foldr addEdges initialGraph
   graph = Prelude.foldr addStopEdge graph (zip stops (Prelude.drop 1 stops))     
   addStopEdge (LineStop s1 , LineStop s2 t2) 
   -- g = addEdge s1 s2 t2 (addEdge s2 s1 t2 g)
->>>>>>> 98f8504a5768ec0f157389b7104726a8baddcc87
