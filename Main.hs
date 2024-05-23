@@ -37,7 +37,7 @@ dijkstra q m g  -- returns set of all nodes in graph with distances from start n
         M.insert current (current, distanceToCurrent) m -- add current to visited , key from PQ becoems key in map
         PQ.deleteMin q -- delete current from queue because it is now visited
         dijkstra (insertAllPQ adjacent q) m g -- recursive until done
-    where
+   where
       notVisited edge 
        | isNothing (M.lookup (getDst edge) m) = true  
        | otherwise = false
@@ -57,7 +57,7 @@ startGUI = do
   Right stops <- readStops "your-stops.txt" --Returns [Stops]
   Right lines <- readLines "your-lines.txt" --Returns [Linetables]
   let graph = buildGraph stops lines
-  print (shortestPath(graph "Angered" "Chalmers"))
+  print ("sd")
   print $ "endOfStartGUI" 
    
 
@@ -66,12 +66,7 @@ extr :: Stop -> String
 extr (Stop name b) = name
 
 buildGraph :: [Stop] -> [LineTable] -> (Graph String Integer)
-buildGraph stops = Prelude.foldr addEdges initialGraph   
- where     
-  initialGraph = Prelude.foldr (addVertex . name) Empty stops    addEdges (LineTable  stops) 
-  graph = Prelude.foldr addStopEdge graph (zip stops (Prelude.drop 1 stops))     
-  addStopEdge (LineStop s1 , LineStop s2 t2) 
-  -- g = addEdge s1 s2 t2 (addEdge s2 s1 t2 g)
+buildGraph = undefined 
 
 
 
