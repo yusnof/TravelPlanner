@@ -1,18 +1,13 @@
 module Graph 
   ( -- * Edge
-    Edge (..)      -- type
-  --, src, dst, label        -- querying an Edge
-    -- * Grapgh
+    Edge                    -- type
+  , src, dst, label         -- querying an Edge
   , Graph                   -- type
   , empty                   -- create an empty map
   , addVertex, addVertices  -- adding vertices (nodes)
   , addEdge, addBiEdge      -- adding edges (one way or both ways)
   , adj                     -- get adjacent nodes for a given node
   , vertices, edges         -- querying a Graph
-  , getName
-  , getDst
-  , getLabel 
-  , graphLookUp
   ) where
 
 import Data.Map (Map)
@@ -67,18 +62,8 @@ adj k (Graph m)= unWrap(M.lookup k m) --findWithDefault
         
 -- | Get all vertices (nodes) in a graph
 vertices :: Graph a b -> [a]
-vertices (Graph m) =  map fst (M.toList m) --Så vackert! Det är bara ett Namn! 3 plus points
+vertices (Graph m) =  map fst (M.toList m)
 
 -- | Get all edges in a graph
 edges :: Graph a b -> [Edge a b]
 edges (Graph m) = concatMap snd (M.toList m)
-
-getLabel :: Edge a b -> b 
-getLabel (Edge _ _ label) = label
-
-getDst :: Edge a b -> a 
-getDst (Edge _ dst _) = dst
-
-getName :: Edge a b -> a 
-getName (Edge name _ _) = name
-graphLookUp k (Graph m) = unWrap(M.lookup k m) 
