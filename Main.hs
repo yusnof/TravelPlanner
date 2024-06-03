@@ -4,8 +4,9 @@ import Data.PSQueue as PQ
 import Data.Map as M
 import Data.Maybe
 import System.Environment
+import Debug.Trace
 
-shortestPath :: (Ord a, Ord b, Num b) => Graph a b -> a -> a -> Maybe ([a], b)
+shortestPath :: (Ord a, Ord b, Num b, Show a, Show b) => Graph a b -> a -> a -> Maybe ([a], b)
 shortestPath g from to = Just (findShortest set from to [] g, unwrap (M.lookup to set))
     where
      --set:: Map a b
@@ -27,21 +28,23 @@ findShortest set start stop list graph
 -- if adjacent is singleton (node only has 1 connected edge) what will happen? tail [x] = [], M.lookup [] ??
 findNext :: (Ord b, Ord a) => [Edge a b] -> Edge a b -> Map a b -> a
 findNext [] smallest set = src smallest
-findNext [x] smallest set
- |  unwrap(M.lookup (src x) set)  <  unwrap(M.lookup (src smallest) set) = src smallest
- |  otherwise = src smallest
+--findNext [x] smallest set
+-- |  unwrap(M.lookup (src x) set)  <  unwrap(M.lookup (src smallest) set) = src smallest
+-- |  otherwise = src smallest
 findNext (x:xs) smallest set
   | unwrap(M.lookup (src x) set) > unwrap(M.lookup (src smallest) set) = findNext xs x set
   | otherwise = findNext xs smallest set
 
-dijkstra :: (Ord k, Ord p, Num p) => PSQ k p -> Map k p -> Graph k p -> k -> Map k p
-dijkstra queue map graph from = recursive createQueue map graph
+dijkstra :: (Ord k, Ord p, Num p, Show p, Show k) => PSQ k p -> Map k p -> Graph k p -> k -> Map k p
+dijkstra queue map graph from =  recursive createQueue map graph
     where 
         createQueue = PQ.insert from 0 queue
 
-recursive :: (Ord p, Num p, Ord k) => PSQ k p -> Map k p -> Graph k p -> Map k p
+recursive :: (Ord p, Num p, Ord k, Show p, Show k) => PSQ k p -> Map k p -> Graph k p -> Map k p
 recursive queue map graph 
+  -- | trace ("insertAllPQ: x = " ++ show queue ++ ", distanceToCurrent = " ++ show map) False= undefined
  | PQ.null queue = map
+ | trace ("adj" ++ show adjacent) False  = undefined
  | otherwise = recursive newqueue newmap graph
   where
     current = PQ.key (unwrap (PQ.findMin queue)) 
@@ -50,9 +53,10 @@ recursive queue map graph
     distanceToCurrent = PQ.prio (unwrap (PQ.findMin queue))
     newmap = M.insert current distanceToCurrent map
 
-insertAllPQ :: (Ord a, Num b, Ord b) => [Edge a b] -> b -> PSQ a b -> PSQ a b 
+insertAllPQ :: (Ord a, Num b, Ord b, Show a, Show b) => [Edge a b] -> b -> PSQ a b -> PSQ a b 
 insertAllPQ [] _ q = q
 insertAllPQ [x] distanceToCurrent q 
+  -- | trace ("insertAllPQ: x = " ++ show x ++ ", distanceToCurrent = " ++ show distanceToCurrent ++ ", q = " ++ show q) False = undefined
   | isNothing (PQ.lookup (src x) q) = PQ.insert (src x) (distanceToCurrent + label x) q
   | otherwise = updatePQvalue (src x) (distanceToCurrent + label x) q
 insertAllPQ (x:xs) distanceToCurrent q
@@ -77,7 +81,7 @@ unwrap _ = error "Not find"
 -- search if we have been at this node in our map
 notVisited :: Ord k => Edge k b -> Map k a -> Bool
 notVisited edge map 
-       | isNothing (M.lookup (dst edge) map) = True  
+       | isNothing (M.lookup (dst edge) map) = True   
        | otherwise = False
 {-}
 startGUI :: IO ()
@@ -152,4 +156,5 @@ buildGraph graph [_] = graph
 buildGraph graph ((stop, weight):second@(nextStop, nextWeight):rest)
     | nextWeight == 0 = buildGraph graph (second:rest)
     | otherwise = buildGraph (addEdge stop nextStop nextWeight graph) ((nextStop, nextWeight):rest)
+  
 
