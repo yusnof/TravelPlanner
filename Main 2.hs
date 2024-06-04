@@ -75,3 +75,5 @@ buildGraph graph [_] = graph
 buildGraph graph ((stop, weight):snd@(nextStop, nextWeight):rest)
     | nextWeight == 0 = buildGraph graph (snd:rest)
     | otherwise = buildGraph (addEdge stop nextStop nextWeight graph) ((nextStop, nextWeight):rest)
+
+

@@ -6,8 +6,9 @@ import Data.Maybe
 import System.Environment
 import Debug.Trace
 
+-- start prev node
 shortestPath :: (Ord a, Ord b, Num b, Show a, Show b) => Graph a b -> a -> a -> Maybe ([a], b)
-shortestPath graph from to = Just (findPath set from to graph [], unwrap (M.lookup to set))
+shortestPath graph from to =   Just (findPath set from to graph [], unwrap (M.lookup to set))
     where
      --set:: Map a b
      set       = dijkstra unvisited visited graph from to   
@@ -18,7 +19,7 @@ shortestPath graph from to = Just (findPath set from to graph [], unwrap (M.look
 
 findPath :: (Eq a, Ord a, Ord b, Show a, Show b) => Map a b -> a -> a -> Graph a b -> [a] -> [a]
 findPath set start stop graph list
-  | start == stop = (buildList adjacent)
+  | start == stop = buildList adjacent
   | otherwise = findPath set newStart stop graph (buildList adjacent)
     where
       buildList [] = list
