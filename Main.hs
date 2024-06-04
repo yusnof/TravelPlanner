@@ -10,13 +10,13 @@ shortestPath :: (Ord a, Ord b, Num b, Show a, Show b) => Graph a b -> a -> a -> 
 shortestPath g from to = Just (findShortest set from to [] g, unwrap (M.lookup to set))
     where
      --set:: Map a b
-     set       = dijkstra unvisited visited g from  
+     set       = dijkstra unvisited visited g from to   
      --visited:: Map a Integer -- set of all visited nodes
      visited   =  M.empty
      --unvisited:: PSQ String Int  -- p.queue of all not visited nodes
      unvisited = PQ.empty
  
-findShortest :: (Eq a, Ord a, Ord b) => Map a b -> a -> a -> [a]-> Graph a b -> [a]
+findShortest :: (Eq a, Ord a, Ord b, Show a, Show b) => Map a b -> a -> a -> [a]-> Graph a b -> [a]
 findShortest set start stop list graph
  | start == stop = list
  | otherwise = findShortest set newstart stop newlist graph
@@ -26,26 +26,65 @@ findShortest set start stop list graph
     newlist  = list ++ [newstart]
   
 -- if adjacent is singleton (node only has 1 connected edge) what will happen? tail [x] = [], M.lookup [] ??
-findNext :: (Ord b, Ord a) => [Edge a b] -> Edge a b -> Map a b -> a
+findNext :: (Ord b, Ord a, Show a, Show b) => [Edge a b] -> Edge a b -> Map a b -> a
 findNext [] smallest set = src smallest
---findNext [x] smallest set
--- |  unwrap(M.lookup (src x) set)  <  unwrap(M.lookup (src smallest) set) = src smallest
--- |  otherwise = src smallest
+findNext [x] smallest set
+ |  trace ("findNext: x = " ++ show x ++ "smallest = "++ show smallest ++ "set= " ++ show set) False = undefined
+ |  unwrap(M.lookup (src x) set)  <  unwrap(M.lookup (src smallest) set) = src smallest
+ |  otherwise = src smallest
 findNext (x:xs) smallest set
+  |  trace ("findNext: x = " ++ show x ++ "smallest = "++ show smallest ++ "set= " ++ show set) False = undefined
   | unwrap(M.lookup (src x) set) > unwrap(M.lookup (src smallest) set) = findNext xs x set
   | otherwise = findNext xs smallest set
 
 
-dijkstra :: (Ord k, Ord p, Num p, Show p, Show k) => PSQ k p -> Map k p -> Graph k p -> k -> Map k p
-dijkstra queue map graph from =  recursive createQueue map graph
+dijkstra :: (Ord k, Ord p, Num p, Show p, Show k) => PSQ k p -> Map k p -> Graph k p -> k -> k -> Map k p
+dijkstra queue map graph from to= recursive createQueue map graph to
     where 
         createQueue = PQ.insert from 0 queue
 
+
+{-
+recursive :: (Ord p, Num p, Ord k, Show k, Show p) => PSQ k p -> Map k p -> Graph k p -> k -> Map k p
+recursive queue map graph to 
+  | trace ("recursive:: Queue= "++show queue ++"\n" ++"/map= "++ show map++"/Adjacent="++show adjacent) False = undefined
+  | PQ.null queue= map
+  | otherwise = recursive newqueue newmap graph to 
+  where
+    newmap = updateMap (PQ.key (unwrap (PQ.findMin queue))) (distanceToCurrent queue) map
+    adjacent = findAdjacent queue newmap graph
+    newqueue = updateQueue adjacent (distanceToCurrent queue) (PQ.delete (current queue) queue)
+-}
+recursive :: (Ord p, Num p, Ord k, Show k, Show p) => PSQ k p -> Map k p -> Graph k p -> k -> Map k p
+recursive queue map graph to 
+  | trace ("recursive:: Queue= "++show queue ++"\n" ++"/map= "++ show map++"/Adjacent="++show adjacent) False = undefined
+  | PQ.null queue = map
+  | otherwise = recursive newQueue newMap graph to 
+  where
+    currentKey = PQ.key (unwrap2 (PQ.findMin queue))
+    currentDist = PQ.prio (unwrap2 (PQ.findMin queue))
+    newMap = updateMap currentKey currentDist map
+    adjacent = findAdjacent currentKey newMap graph
+    newQueue = updateQueue adjacent currentDist (PQ.delete currentKey queue)
+
+
+
+findAdjacent :: (Ord k) => k -> Map k p -> Graph k p -> [Edge k p]
+findAdjacent currentKey map graph = [x | x <- adj currentKey graph, notVisited x map]
+{-
+current q = PQ.key (unwrap2 (PQ.findMin q))
+distanceToCurrent q = PQ.prio (unwrap (PQ.findMin q))
+findAdjacent q m g = [x | x <- adj (current q) g, notVisited x m] -}
+updateMap current dist m = M.insert current dist m
+
+updateQueue [] dist q = q
+updateQueue adj dist q = insertAllPQ adj dist q
+
+{-
 recursive :: (Ord p, Num p, Ord k, Show p, Show k) => PSQ k p -> Map k p -> Graph k p -> Map k p
 recursive queue map graph 
   -- | trace ("insertAllPQ: x = " ++ show queue ++ ", distanceToCurrent = " ++ show map) False= undefined
  | PQ.null queue = map
- | trace ("adj" ++ show adjacent) False  = undefined
  | otherwise = recursive newqueue newmap graph
   where
     current = PQ.key (unwrap (PQ.findMin queue)) 
@@ -53,31 +92,44 @@ recursive queue map graph
     newqueue = insertAllPQ adjacent distanceToCurrent (PQ.deleteMin queue)
     distanceToCurrent = PQ.prio (unwrap (PQ.findMin queue))
     newmap = M.insert current distanceToCurrent map
-
+-}
 insertAllPQ :: (Ord a, Num b, Ord b, Show a, Show b) => [Edge a b] -> b -> PSQ a b -> PSQ a b 
 insertAllPQ [] _ q = q
 insertAllPQ [x] distanceToCurrent q 
-  -- | trace ("insertAllPQ: x = " ++ show x ++ ", distanceToCurrent = " ++ show distanceToCurrent ++ ", q = " ++ show q) False = undefined
-  | isNothing (PQ.lookup (src x) q) = PQ.insert (src x) (distanceToCurrent + label x) q
-  | otherwise = updatePQvalue (src x) (distanceToCurrent + label x) q
+  | trace ("insertAllPQ: x = " ++ show x ++ ", distanceToCurrent = " ++ show distanceToCurrent ++ ", q = " ++ show q) False = undefined
+  -- | isNothing (PQ.lookup (src x) q) = PQ.insert (src x) (distanceToCurrent + label x) q
+ -- | otherwise = updatePQvalue (src x) (distanceToCurrent + label x) q
 insertAllPQ (x:xs) distanceToCurrent q
-  | isNothing (PQ.lookup (src x) q) = insertAllPQ xs distanceToCurrent (PQ.insert (src x) (distanceToCurrent + label x) q)
-  | otherwise =  insertAllPQ xs distanceToCurrent (updatePQvalue (src x) (distanceToCurrent + label x) q)    
+  | trace ("insertAllPQ: x = " ++ show x ++ ", distanceToCurrent = " ++ show distanceToCurrent ++ ", q = " ++ show q) False = undefined
+  | isNothing (PQ.lookup (dst x) q) = insertAllPQ xs distanceToCurrent (PQ.insert (dst x) (distanceToCurrent + label x) q)
+  | otherwise =  insertAllPQ xs distanceToCurrent (updatePQvalue (dst x) (distanceToCurrent + label x) q)    
 
 
 --updatePQvalue :: (Ord p, Ord k) => String -> Integer -> PSQ k p -> PSQ k p
 updatePQvalue :: (Ord p, Ord k) => k -> p -> PSQ k p -> PSQ k p
+updatePQvalue key newValue q =
+  case PQ.lookup key q of
+    Nothing -> PQ.insert key newValue q
+    Just current ->
+      if current >= newValue
+        then PQ.insert key newValue (PQ.delete key q)
+        else q 
+{-}
 updatePQvalue key newValue q
- | unwrap(PQ.lookup key q) < newValue = update key newValue q
+ | unwrap(PQ.lookup key q) >= newValue = update key newValue q --If value found is smaller, replace existing value in Q
  | otherwise = q 
   where 
     update key newValue q = PQ.insert key newValue (PQ.delete key q) 
-
-
+-}
 -- unwraps from Maybe a to a            
 unwrap :: Maybe a -> a 
-unwrap (Just a) = a 
-unwrap _ = error "Not find"
+unwrap (Just x) = x
+unwrap Nothing = error "unwrapp1 nothing"
+
+unwrap2 :: Maybe a -> a 
+unwrap2 (Just x) = x
+unwrap2 Nothing = error "Deez nuts, unwrapp 2 nothing "
+
 
 -- search if we have been at this node in our map
 notVisited :: Ord k => Edge k b -> Map k a -> Bool
