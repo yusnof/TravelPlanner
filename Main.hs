@@ -146,7 +146,8 @@ main = do
   Right lines <- readLines lFile --Returns [Linetables]
   let graph = buildGraph Graph.empty (tableTupleBuilder lines)
   let sPath = unwrap (shortestPath graph start end)
-  print $ fst (sPath)
+  print $ snd (sPath)
+  putStr $ unlines $ fst $ sPath
 
 
 

@@ -1,5 +1,5 @@
 module Graph 
-  ( -- * Edge
+  {-( -- * Edge
     Edge                    -- type
   , src, dst, label         -- querying an Edge
   , Graph                   -- type
@@ -8,7 +8,7 @@ module Graph
   , addEdge, addBiEdge      -- adding edges (one way or both ways)
   , adj                     -- get adjacent nodes for a given node
   , vertices, edges         -- querying a Graph
-  ) where
+  ) -}where
 
 import Data.Map (Map)
 import qualified Data.Map as M
