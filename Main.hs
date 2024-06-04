@@ -10,9 +10,9 @@ shortestPath :: (Ord a, Ord b, Num b, Show a, Show b) => Graph a b -> a -> a -> 
 shortestPath g from to = Just (findShortest set from to [] g, unwrap (M.lookup to set))
     where
      --set:: Map a b
-     set = dijkstra unvisited visited g from  
+     set       = dijkstra unvisited visited g from  
      --visited:: Map a Integer -- set of all visited nodes
-     visited = M.empty
+     visited   =  M.empty
      --unvisited:: PSQ String Int  -- p.queue of all not visited nodes
      unvisited = PQ.empty
  
@@ -34,6 +34,7 @@ findNext [] smallest set = src smallest
 findNext (x:xs) smallest set
   | unwrap(M.lookup (src x) set) > unwrap(M.lookup (src smallest) set) = findNext xs x set
   | otherwise = findNext xs smallest set
+
 
 dijkstra :: (Ord k, Ord p, Num p, Show p, Show k) => PSQ k p -> Map k p -> Graph k p -> k -> Map k p
 dijkstra queue map graph from =  recursive createQueue map graph
