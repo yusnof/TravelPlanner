@@ -1,142 +1,70 @@
 import Route
-import Graph   -- Create a module and use a sensible graph representation
+import Graph
 import Data.PSQueue as PQ
 import Data.Map as M
 import Data.Maybe
-import System.Environment
-import Debug.Trace
+import System.Environment (getArgs)
+import Data.Set as S 
 
--- start prev node
-shortestPath :: (Ord a, Ord b, Num b, Show a, Show b) => Graph a b -> a -> a -> Maybe ([a], b)
-shortestPath graph from to =   Just (findPath set from to graph [], unwrap (M.lookup to set))
+-- Shortest path function
+shortestPath :: (Ord a, Ord b, Num b) => Graph a b -> a -> a -> Maybe ([a], b)
+shortestPath graph from to = Just (reconstructPath fin from to, distance)
     where
-     --set:: Map a b
-     set       = dijkstra unvisited visited graph from to   
-     --visited:: Map a Integer -- set of all visited nodes
-     visited   =  M.empty
-     --unvisited:: PSQ String Int  -- p.queue of all not visited nodes
-     unvisited = PQ.empty
+     (fin , distance) = dijkstra unvisitedQ visitedSet map graph from to
+     map :: Map a (a, b) --map node (prev node, distance to node )
+     map = M.empty
+     visitedSet :: Set a  --set of all visited nodes
+     visitedSet =  S.empty  -- p.queue of all not visited nodes
+     unvisitedQ = PQ.empty
 
-findPath :: (Eq a, Ord a, Ord b, Show a, Show b) => Map a b -> a -> a -> Graph a b -> [a] -> [a]
-findPath set start stop graph list
-  | start == stop = buildList adjacent
-  | otherwise = findPath set newStart stop graph (buildList adjacent)
-    where
-      buildList [] = list
-      buildList (x:xs) = list ++ [src (smallestOfAdjacent (x:xs) set)]
-      adjacent = adj start graph
-      newStart = dst (smallestOfAdjacent adjacent set)
-
-smallestOfAdjacent :: (Ord b, Ord a, Show a, Show b) => [Edge a b] -> Map a b -> Edge a b 
-smallestOfAdjacent [x] set =  x
-smallestOfAdjacent (x:xs) set = smallest x (smallestOfAdjacent xs set) 
-  where 
-    lookup x set = unwrap(M.lookup (src x) set)
-    smallest a1 b1 
-     | lookup a1 set >= lookup b1 set = b1
-     | otherwise = a1   
-    
-
-testAdjacent = do
-   Right lines <- readLines "lines-gbg.txt" --Returns [Linetables]
-   let graph = buildGraph Graph.empty (tableTupleBuilder lines)
-   print (Prelude.map show (adj "AAA" graph))
-   print (Prelude.map show (adj "BBB" graph))
-   print (Prelude.map show (adj "DDD" graph))
-   print (Prelude.map show (adj "EEE" graph))
-
-
-dijkstra :: (Ord k, Ord p, Num p, Show p, Show k) => PSQ k p -> Map k p -> Graph k p -> k -> k -> Map k p
-dijkstra queue map graph from to = recursive createQueue map graph to
+-- Dijkstra's algorithm
+dijkstra :: (Ord k, Ord p, Num p) => PSQ k p -> Set k -> Map k (k,p) -> Graph k p -> k -> k -> (Map k (k,p), p)
+dijkstra queue visitedSet map graph from to = recursive createQueue visitedSet map graph to
     where 
         createQueue = PQ.insert from 0 queue
 
-recursive :: (Ord p, Num p, Ord k, Show k, Show p) => PSQ k p -> Map k p -> Graph k p -> k -> Map k p
-recursive queue map graph to 
-  | PQ.null queue = map
-  | otherwise = recursive newQueue newMap graph to 
+-- Reconstruct the path from the map
+reconstructPath :: (Ord a) => M.Map a (a, b) -> a -> a -> [a]
+reconstructPath map start stop 
+  | start == stop = [start]
+  | isNothing (M.lookup stop map) = error "No path found"
+  | otherwise = reconstructPath map start (fst prev) ++ [stop]
   where
-    currentKey = PQ.key (unwrap2 (PQ.findMin queue))
-    currentDist = PQ.prio (unwrap2 (PQ.findMin queue))
-    newMap = updateMap currentKey currentDist map
-    adjacent = findAdjacent currentKey newMap graph
-    newQueue = updateQueue adjacent currentDist (PQ.delete currentKey queue)
+    prev = fromJust (M.lookup stop map)
 
+-- Recursive function that finds the shortest path
+recursive :: (Ord p, Num p, Ord k) => PSQ k p -> Set k -> Map k (k, p) -> Graph k p -> k -> (Map k (k, p) , p)
+recursive queue visitedSet map graph to 
+    | PQ.null queue = (map, snd(fromMaybe (error "recursive: no path here ") (M.lookup to map)))
+    | currentKey == to = (newMap, currentDist)
+    | otherwise = recursive newQ newSet newMap graph to
+  where
+    (currentKey, currentDist) = (PQ.key (fromJust (PQ.findMin queue)), PQ.prio (fromJust (PQ.findMin queue)))
+    adjacent = findAdjacent currentKey visitedSet graph
+    newSet = S.insert currentKey visitedSet
+    (newQ, newMap) = updateQandMap adjacent currentDist (PQ.deleteMin queue) map currentKey
 
-findAdjacent :: (Ord k) => k -> Map k p -> Graph k p -> [Edge k p]
-findAdjacent currentKey map graph = [x | x <- adj currentKey graph, notVisited x map]
+-- Find all adjacent nodes to the current node
+findAdjacent :: (Ord k) => k -> Set k -> Graph k p -> [Edge k p]
+findAdjacent currentKey set graph = [x | x <- adj currentKey graph, S.notMember (dst x) set] 
 
-updateMap current dist m = M.insert current dist m
-updateQueue [] dist q = q
-updateQueue adj dist q = insertAllPQ adj dist q
-
-insertAllPQ :: (Ord a, Num b, Ord b, Show a, Show b) => [Edge a b] -> b -> PSQ a b -> PSQ a b 
-insertAllPQ [] _ q = q
-insertAllPQ (x:xs) distanceToCurrent q
-  | isNothing (PQ.lookup (dst x) q) = insertAllPQ xs distanceToCurrent (PQ.insert (dst x) (distanceToCurrent + label x) q)
-  | otherwise =  insertAllPQ xs distanceToCurrent (updatePQvalue (dst x) (distanceToCurrent + label x) q)    
-
-
-updatePQvalue :: (Ord p, Ord k) => k -> p -> PSQ k p -> PSQ k p
-updatePQvalue key newValue q =
-  case PQ.lookup key q of
-    Nothing -> PQ.insert key newValue q
-    Just current ->
-      if current >= newValue
-        then PQ.insert key newValue (PQ.delete key q)
-        else q 
-
--- unwraps from Maybe a to a            
-unwrap :: Maybe a -> a 
-unwrap (Just x) = x
-unwrap Nothing = error "unwrapp1 nothing"
-
-unwrap2 :: Maybe a -> a 
-unwrap2 (Just x) = x
-unwrap2 Nothing = error "unwrapp 2 nothing "
-
-
--- search if we have been at this node in our map
-notVisited :: Ord k => Edge k b -> Map k a -> Bool
-notVisited edge map 
-       | isNothing (M.lookup (dst edge) map) = True   
-       | otherwise = False
-{-
-startGUI :: IO ()
-startGUI = do
-  Right stops <- readStops "stops-air.txt" --Returns [Stops]
-  Right lines <- readLines "lines-air.txt" --Returns [Linetables]
-  let graph = buildGraph Graph.empty lines 
-  print (graph)
- -- print (snd(unwrap(shortestPath graph "BOS" "LAX" )))
-  print $ "endOfStartGUI"
--}
-startGUI :: IO ()
-startGUI = do
-  args <- getArgs --Read arguments from console.
-  let sFile = args !! 0
-  let lFile = args !! 1
-  let start = args !! 2
-  let end  =  args !! 3
-  {-
-  let sFile = "stops-gbg.txt"
-  let lFile = "lines-gbg.txt"
-  let start = "AAA"
-  let end = "EEE"
-  -}
-  Right stops <- readStops sFile --Returns [Stops]
-  Right lines <- readLines lFile --Returns [Linetables]
-  let graph = buildGraph Graph.empty (tableTupleBuilder lines)
-  let sPath = unwrap (shortestPath graph start end)
-  print "After sPath"
-  print "Shortest int"
-  print $ fst $ sPath
-  print $ "endOfStartGUI"
-
-
+-- Update the priority queue and the map
+updateQandMap :: (Ord p, Ord k, Num p) => [Edge k p] -> p -> PSQ k p -> Map k (k,p) -> k -> (PSQ k p, Map k (k,p))
+updateQandMap [] _ q map _ = (q, map)
+updateQandMap (x:xs) distanceToCurrent q map previous = updateQandMap xs distanceToCurrent newQ newMap previous
+  where
+    (newQ, newMap) = updateHelp (dst x) (distanceToCurrent + label x) q map previous
+    updateHelp :: (Ord p, Ord k) => k -> p -> PSQ k p -> Map k (k, p) -> k -> (PSQ k p, Map k (k,p))
+    updateHelp key newValue q map previous = case PQ.lookup key q of
+      Nothing -> (PQ.insert key newValue q, M.insert key (previous,newValue) map)
+      Just current ->
+          if newValue < current
+            then (PQ.insert key newValue (PQ.delete key q), M.insert key (previous,newValue) map)
+            else (q, map)
+    
+-- Main function
 main :: IO ()
 main = do 
-  -- startGUI  -- TODO: read arguments, build graph, output shortest path
   args <- getArgs --Read arguments from console.
   let sFile = args !! 0
   let lFile = args !! 1
@@ -145,20 +73,11 @@ main = do
   Right stops <- readStops sFile --Returns [Stops]
   Right lines <- readLines lFile --Returns [Linetables]
   let graph = buildGraph Graph.empty (tableTupleBuilder lines)
-  let sPath = unwrap (shortestPath graph start end)
-  print $ snd (sPath)
+  let sPath = fromJust (shortestPath graph start end)
+  print $ snd $ sPath
   putStr $ unlines $ fst $ sPath
 
-
-
-
---Since each [LineStops] in each LineTable contains a dummy weight (also called time elsewhere in code) in a tuple as first element  like this: (stop, dummyWeight):()...
--- we can't concatenate all tuple into a single list and then start inserting into graph, we would add weird 0-weight edges between stops that should't have them.
---that is why buildGraph was changed
--- new buildGraph builds seperate [LineStop] for each LineTable and calls insert func on each of them seperately
-
-
---tableTuple creates a list of tuples from a list of LineTables
+--tableTupleBuilder builds a list of tuples from a list of linetables
 tableTupleBuilder :: [LineTable] -> [(String, Integer)]
 tableTupleBuilder table = tup
   where
@@ -172,4 +91,3 @@ buildGraph graph [_] = graph
 buildGraph graph ((stop, weight):second@(nextStop, nextWeight):rest)
     | nextWeight == 0 = buildGraph graph (second:rest)
     | otherwise = buildGraph (addEdge stop nextStop nextWeight graph) ((nextStop, nextWeight):rest)
-  
